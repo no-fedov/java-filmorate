@@ -6,6 +6,7 @@ import lombok.NonNull;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
+
 /**
  * Film.
  */
@@ -13,8 +14,6 @@ import java.time.LocalDate;
 @Builder
 public class Film {
     private int id;
-    @NonNull
-    @NotBlank
     private String name;
     private String description;
     private LocalDate releaseDate;
