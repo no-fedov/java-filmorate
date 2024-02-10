@@ -17,12 +17,12 @@ import java.util.Map;
 @RequestMapping("/films")
 public class FilmController {
     private final Map<Integer, Film> dataFilm = new HashMap<>();
-    private final String TEXT = "Получен запрос: {} : {}";
+    private final String text = "Получен запрос: {} : {}";
     private int generatorID = 0;
 
     @GetMapping
     public List<Film> getFilms() {
-        log.info(TEXT, "Показать список фильмов", dataFilm.values());
+        log.info(text, "Показать список фильмов", dataFilm.values());
         return new ArrayList<>(dataFilm.values());
     }
 
@@ -30,12 +30,12 @@ public class FilmController {
     public Film postFilm(@Valid @RequestBody Film film) {
         try {
             if (FilmValidator.verify(film)) {
-                log.info(TEXT, "Добавить фильм", film);
+                log.info(text, "Добавить фильм", film);
                 film.setId(++generatorID);
                 dataFilm.put(generatorID, film);
             }
         } catch (ValidationException e) {
-            log.info(TEXT, "Добавить фильм: " + film.toString(), e.getMessage());
+            log.info(text, "Добавить фильм: " + film.toString(), e.getMessage());
             throw e;
         }
         return film;
@@ -45,11 +45,11 @@ public class FilmController {
     public Film putFilm(@RequestBody Film film) {
         if (dataFilm.get(film.getId()) == null) {
             ValidationException exception = new ValidationException("Нельзя обновить несуществующий фильм");
-            log.warn(TEXT, "Обновить фильм", "Ошибка: " + exception.getMessage());
+            log.warn(text, "Обновить фильм", "Ошибка: " + exception.getMessage());
             throw exception;
         } else {
             if (FilmValidator.verify(film)) {
-                log.info(TEXT, "Обновить фильм", film);
+                log.info(text, "Обновить фильм", film);
                 dataFilm.put(film.getId(), film);
             }
         }
