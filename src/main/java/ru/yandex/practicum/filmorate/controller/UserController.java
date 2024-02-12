@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -26,47 +28,51 @@ public class UserController {
     }
 
     @PostMapping
-    public User postUser(@RequestBody User user) {
-        try {
-            log.info(text, "Добавить пользователя", user);
-            if (UserValidator.verify(user)) {
-                if (usersData.containsKey(user.getEmail())) {
-                    log.warn("Такой email занят: {}", user.getEmail());
-                    throw new ValidationException("Такой email занят");
-                }
+    public ResponseEntity<User> postUser(@RequestBody User user) {
+        log.info(text, "Добавить пользователя", user);
 
-                user.setId(++generatorID);
+        UserValidator.verify(user);
+        checkEmail(user);
 
-                if (user.getName() == null || user.getName().trim().isEmpty()) {
-                    user.setName(user.getLogin());
-                }
 
-                usersData.put(generatorID, user);
-            }
-        } catch (ValidationException e) {
-            log.info(text, "Добивить пользователя: " + user + ". Ошибка: ", e.getMessage());
-            throw e;
-        }
-        log.info("Добавили юзера: " + user);
-        return user;
+        User user1 = user.toBuilder().id(++generatorID).build();
+        User changedUser = setUpName(user1);
+        usersData.put(generatorID, changedUser);
+
+        log.info("Пользователь добавлен: " + user1);
+
+        return new ResponseEntity<>(changedUser, HttpStatus.OK);
     }
 
     @PutMapping
-    public User putUser(@RequestBody User user) {
-        if (usersData.containsKey(user.getId()))
-            try {
-                if (UserValidator.verify(user)) {
-                    log.info(text, "Обновить пользователя", user);
-                    usersData.put(user.getId(), user);
-                }
-            } catch (ValidationException e) {
-                log.info(text, "Обновить пользователя " + user + ". Ошибка: ", e.getMessage());
-                throw e;
-            }
-        else {
+    public ResponseEntity<User> putUser(@RequestBody User user) {
+        log.info(text, "Обновить пользователя", user);
+
+        UserValidator.verify(user);
+
+        if (usersData.containsKey(user.getId())) {
+            usersData.put(user.getId(), user);
+        } else {
             log.warn(text, "Нельзя обновить пользователя с несуществующим id. ", user);
             throw new ValidationException("Нельзя обновить несуществующего пользователя");
         }
+        return new ResponseEntity<>(user,HttpStatus.OK);
+    }
+
+    private User setUpName(User user) {
+        if (user.getName() == null || user.getName().trim().isBlank()) {
+            return user.toBuilder().name(user.getLogin()).build();
+        }
         return user;
+    }
+
+    private void checkEmail(User user) {
+        boolean condition = usersData.values().stream()
+                .anyMatch(a -> a.getEmail().equals(user.getEmail()));
+
+        if (condition) {
+            log.warn("Такой email занят: {}", user.getEmail());
+            throw new ValidationException("Такой email занят");
+        }
     }
 }

@@ -2,6 +2,7 @@ package unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -41,7 +42,6 @@ public class UserControllerTest {
                 .id(0)
                 .name("name")
                 .login("login")
-                .email(null)
                 .birthday(LocalDate.of(1990, 1, 1))
                 .build();
 
@@ -62,8 +62,9 @@ public class UserControllerTest {
                 .birthday(LocalDate.of(1990, 1, 1))
                 .build();
 
-        userController.postUser(user);
-        assertEquals(user.getName(), user.getLogin());
+        ResponseEntity<User> response = userController.postUser(user);
+
+        assertEquals(response.getBody().getName(), user.getLogin());
     }
 
     @Test

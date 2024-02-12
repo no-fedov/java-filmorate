@@ -28,30 +28,26 @@ public class FilmController {
 
     @PostMapping
     public Film postFilm(@Valid @RequestBody Film film) {
-        try {
-            if (FilmValidator.verify(film)) {
-                log.info(text, "Добавить фильм", film);
-                film.setId(++generatorID);
-                dataFilm.put(generatorID, film);
-            }
-        } catch (ValidationException e) {
-            log.info(text, "Добавить фильм: " + film.toString(), e.getMessage());
-            throw e;
-        }
-        return film;
+        log.info(text, "Добавить фильм", film);
+        FilmValidator.verify(film);
+        Film film1 = film.toBuilder().id(++generatorID).build();
+        dataFilm.put(generatorID, film1);
+        log.info("Добавлен фильм: " + film1);
+        return film1;
     }
 
     @PutMapping
     public Film putFilm(@RequestBody Film film) {
+        log.info(text, "Обновить фильм", film);
+        FilmValidator.verify(film);
+
         if (dataFilm.get(film.getId()) == null) {
             ValidationException exception = new ValidationException("Нельзя обновить несуществующий фильм");
             log.warn(text, "Обновить фильм", "Ошибка: " + exception.getMessage());
             throw exception;
         } else {
-            if (FilmValidator.verify(film)) {
-                log.info(text, "Обновить фильм", film);
-                dataFilm.put(film.getId(), film);
-            }
+            log.info("Обновлен фильм: {}", film);
+            dataFilm.put(film.getId(), film);
         }
         return film;
     }

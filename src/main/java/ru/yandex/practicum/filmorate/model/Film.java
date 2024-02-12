@@ -11,9 +11,9 @@ import java.time.LocalDate;
  * Film.
  */
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class Film {
-    private int id;
+    private final int id;
     private String name;
     private String description;
     private LocalDate releaseDate;
