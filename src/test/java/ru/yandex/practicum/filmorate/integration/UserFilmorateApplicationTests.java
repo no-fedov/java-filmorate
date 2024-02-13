@@ -9,7 +9,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.integration.controller.UserController;
-import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
 import ru.yandex.practicum.filmorate.integration.model.User;
 
 import java.time.LocalDate;
