@@ -1,13 +1,14 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.integration.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validator.UserValidator;
+import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
+import ru.yandex.practicum.filmorate.integration.model.User;
+import ru.yandex.practicum.filmorate.integration.validator.UserValidator;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> postUser(@RequestBody User user) {
+    public ResponseEntity<User> postUser(@Valid @RequestBody User user) {
         log.info(text, "Добавить пользователя", user);
 
         UserValidator.verify(user);
@@ -45,7 +46,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<User> putUser(@RequestBody User user) {
+    public ResponseEntity<User> putUser(@Valid @RequestBody User user) {
         log.info(text, "Обновить пользователя", user);
 
         UserValidator.verify(user);

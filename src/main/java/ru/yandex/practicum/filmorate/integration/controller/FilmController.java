@@ -1,10 +1,12 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.integration.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
+import ru.yandex.practicum.filmorate.integration.model.Film;
+import ru.yandex.practicum.filmorate.integration.validator.FilmValidator;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -27,17 +29,19 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film postFilm(@Valid @RequestBody Film film) {
+    public ResponseEntity<Film> postFilm(@Valid @RequestBody Film film) {
+        //public Film postFilm(@Valid @RequestBody Film film) {
         log.info(text, "Добавить фильм", film);
         FilmValidator.verify(film);
         Film film1 = film.toBuilder().id(++generatorID).build();
         dataFilm.put(generatorID, film1);
         log.info("Добавлен фильм: " + film1);
-        return film1;
+
+        return new ResponseEntity<>(film1, HttpStatus.OK);
     }
 
     @PutMapping
-    public Film putFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> putFilm(@Valid @RequestBody Film film) {
         log.info(text, "Обновить фильм", film);
         FilmValidator.verify(film);
 
@@ -49,7 +53,7 @@ public class FilmController {
             log.info("Обновлен фильм: {}", film);
             dataFilm.put(film.getId(), film);
         }
-        return film;
+        return new ResponseEntity<>(film, HttpStatus.OK);
     }
 }
 

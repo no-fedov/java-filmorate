@@ -3,9 +3,9 @@ package unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.integration.controller.UserController;
+import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
+import ru.yandex.practicum.filmorate.integration.model.User;
 
 import java.time.LocalDate;
 

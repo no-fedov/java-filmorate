@@ -2,9 +2,9 @@ package unit;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.integration.controller.FilmController;
+import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
+import ru.yandex.practicum.filmorate.integration.model.Film;
 
 import java.time.LocalDate;
 
