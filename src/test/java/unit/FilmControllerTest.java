@@ -38,7 +38,7 @@ public class FilmControllerTest {
     public void check_PostFilm_DescriptionFilmMoreThen200() {
         StringBuilder description = new StringBuilder();
 
-        for (int i =1; i<=200; i++){
+        for (int i = 1; i <= 200; i++) {
             description = description.append(i);
         }
 

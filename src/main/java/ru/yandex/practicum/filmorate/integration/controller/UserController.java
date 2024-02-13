@@ -57,7 +57,7 @@ public class UserController {
             log.warn(text, "Нельзя обновить пользователя с несуществующим id. ", user);
             throw new ValidationException("Нельзя обновить несуществующего пользователя");
         }
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     private User setUpName(User user) {
