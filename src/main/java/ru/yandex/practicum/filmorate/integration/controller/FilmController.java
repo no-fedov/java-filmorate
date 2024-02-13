@@ -30,13 +30,11 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> postFilm(@Valid @RequestBody Film film) {
-        //public Film postFilm(@Valid @RequestBody Film film) {
         log.info(text, "Добавить фильм", film);
         FilmValidator.verify(film);
         Film film1 = film.toBuilder().id(++generatorID).build();
         dataFilm.put(generatorID, film1);
         log.info("Добавлен фильм: " + film1);
-
         return new ResponseEntity<>(film1, HttpStatus.OK);
     }
 

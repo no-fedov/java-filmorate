@@ -8,13 +8,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.NestedServletException;
 import ru.yandex.practicum.filmorate.integration.controller.FilmController;
+import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
 import ru.yandex.practicum.filmorate.integration.model.Film;
-import ru.yandex.practicum.filmorate.integration.validator.FilmValidator;
 
 import java.time.LocalDate;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,10 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FilmFilmorateApplicationTests {
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private FilmController filmController;
-    @MockBean
-    private FilmValidator validationException;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -102,5 +101,24 @@ public class FilmFilmorateApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(film)))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void check_PostFilm_ReleaseDateIsBad() throws Exception {
+        Film film = Film.builder()
+                .name("Film")
+                .description("description").
+                duration(100)
+                .releaseDate(LocalDate.of(1000, 1, 1))
+                .build();
+
+        try {
+            mockMvc.perform(post("/films")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(film)))
+                    .andExpect(status().is4xxClientError());
+        } catch (NestedServletException e) {
+            assertTrue(e.getCause() instanceof ValidationException);
+        }
     }
 }

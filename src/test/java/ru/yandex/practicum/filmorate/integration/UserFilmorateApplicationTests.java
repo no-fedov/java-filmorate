@@ -21,8 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class UserFilmorateApplicationTests {
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
-    private UserController userController;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -157,5 +155,4 @@ public class UserFilmorateApplicationTests {
                         .content(objectMapper.writeValueAsString(user)))
                 .andExpect(status().is4xxClientError());
     }
-
 }
