@@ -1,12 +1,9 @@
-package ru.yandex.practicum.filmorate.integration.controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
-import ru.yandex.practicum.filmorate.integration.model.Film;
-import ru.yandex.practicum.filmorate.integration.validator.FilmValidator;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -29,29 +26,26 @@ public class FilmController {
     }
 
     @PostMapping
-    public ResponseEntity<Film> postFilm(@Valid @RequestBody Film film) {
+    public Film postFilm(@Valid @RequestBody Film film) {
         log.info(text, "Добавить фильм", film);
-        FilmValidator.verify(film);
         Film film1 = film.toBuilder().id(++generatorID).build();
         dataFilm.put(generatorID, film1);
-        log.info("Добавлен фильм: " + film1);
-        return new ResponseEntity<>(film1, HttpStatus.OK);
+        log.info("Добавлен фильм: {}", film1);
+        return film1;
     }
 
     @PutMapping
-    public ResponseEntity<Film> putFilm(@Valid @RequestBody Film film) {
+    public Film putFilm(@Valid @RequestBody Film film) {
         log.info(text, "Обновить фильм", film);
-        FilmValidator.verify(film);
-
         if (dataFilm.get(film.getId()) == null) {
             ValidationException exception = new ValidationException("Нельзя обновить несуществующий фильм");
-            log.warn(text, "Обновить фильм", "Ошибка: " + exception.getMessage());
+            log.warn(text, "Обновить фильм. Ошибка: ", exception.getMessage());
             throw exception;
         } else {
             log.info("Обновлен фильм: {}", film);
             dataFilm.put(film.getId(), film);
         }
-        return new ResponseEntity<>(film, HttpStatus.OK);
+        return film;
     }
 }
 

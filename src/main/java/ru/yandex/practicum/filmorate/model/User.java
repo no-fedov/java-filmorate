@@ -1,11 +1,9 @@
-package ru.yandex.practicum.filmorate.integration.model;
+package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -15,12 +13,14 @@ public class User {
     private String name;
 
     @NotBlank(message = "Неверный формат login")
+    @Pattern(regexp = "^[^\\s]+$", message = "Логин не должен содержать пробелов")
     private String login;
 
     @Email(message = "Неверный формат email")
     @NotBlank(message = "Неверный формат email")
     private String email;
 
-    @Past(message = "Этой даты еще не было")
+    @PastOrPresent(message = "Этой даты еще не было")
+    @NotNull
     private LocalDate birthday;
 }

@@ -1,12 +1,9 @@
-package ru.yandex.practicum.filmorate.integration.controller;
+package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.integration.exception.ValidationException;
-import ru.yandex.practicum.filmorate.integration.model.User;
-import ru.yandex.practicum.filmorate.integration.validator.UserValidator;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -24,40 +21,37 @@ public class UserController {
 
     @GetMapping
     public List<User> getUsers() {
-        log.info(text, "получить всех пользователей", usersData);
+        log.info(text, "Получить всех пользователей", usersData);
         return new ArrayList<>(usersData.values());
     }
 
     @PostMapping
-    public ResponseEntity<User> postUser(@Valid @RequestBody User user) {
+    public User postUser(@Valid @RequestBody User user) {
         log.info(text, "Добавить пользователя", user);
-
-        UserValidator.verify(user);
         checkEmail(user);
-
-
         User user1 = user.toBuilder().id(++generatorID).build();
         User changedUser = setUpName(user1);
         usersData.put(generatorID, changedUser);
-
-        log.info("Пользователь добавлен: " + user1);
-
-        return new ResponseEntity<>(changedUser, HttpStatus.OK);
+        log.info("Пользователь добавлен: {}", user1);
+        return changedUser;
     }
 
     @PutMapping
-    public ResponseEntity<User> putUser(@Valid @RequestBody User user) {
+    public User putUser(@Valid @RequestBody User user) {
         log.info(text, "Обновить пользователя", user);
-
-        UserValidator.verify(user);
-
         if (usersData.containsKey(user.getId())) {
-            usersData.put(user.getId(), user);
+            if (usersData.get(user.getId()).getEmail().equals(user.getEmail())) {
+                usersData.put(user.getId(), user);
+            } else {
+                checkEmail(user);
+                usersData.put(user.getId(), user);
+            }
+            log.info("Пользователь обновлен: {}", user);
         } else {
             log.warn(text, "Нельзя обновить пользователя с несуществующим id. ", user);
             throw new ValidationException("Нельзя обновить несуществующего пользователя");
         }
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        return user;
     }
 
     private User setUpName(User user) {
