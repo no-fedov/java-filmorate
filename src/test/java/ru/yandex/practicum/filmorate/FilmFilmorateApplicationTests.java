@@ -104,8 +104,8 @@ public class FilmFilmorateApplicationTests {
     public void check_PostFilm_ReleaseDateIsBad() throws Exception {
         Film film = Film.builder()
                 .name("Film")
-                .description("description").
-                duration(100)
+                .description("description")
+                .duration(100)
                 .releaseDate(LocalDate.of(1000, 1, 1))
                 .build();
 
