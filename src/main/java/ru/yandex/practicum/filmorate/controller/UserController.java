@@ -39,18 +39,18 @@ public class UserController {
     @PutMapping
     public User putUser(@Valid @RequestBody User user) {
         log.info(text, "Обновить пользователя", user);
-        if (usersData.containsKey(user.getId())) {
-            if (usersData.get(user.getId()).getEmail().equals(user.getEmail())) {
-                usersData.put(user.getId(), user);
-            } else {
-                checkEmail(user);
-                usersData.put(user.getId(), user);
-            }
-            log.info("Пользователь обновлен: {}", user);
-        } else {
+        User oldUser = usersData.get(user.getId());
+        if (oldUser == null) {
             log.warn(text, "Нельзя обновить пользователя с несуществующим id. ", user);
             throw new ValidationException("Нельзя обновить несуществующего пользователя");
         }
+
+        if (!oldUser.getEmail().equals(user.getEmail())) {
+            checkEmail(user);
+        }
+        usersData.put(user.getId(), user);
+        log.info("Пользователь обновлен: {}", user);
+
         return user;
     }
 
