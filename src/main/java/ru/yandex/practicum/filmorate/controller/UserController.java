@@ -1,73 +1,68 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final Map<Integer, User> usersData = new HashMap<>();
-    private final String text = "Получен запрос: {} {}";
-    private int generatorID = 0;
+
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public List<User> getUsers() {
-        log.info(text, "Получить всех пользователей", usersData);
-        return new ArrayList<>(usersData.values());
+        return userService.getAllUser();
     }
 
     @PostMapping
     public User postUser(@Valid @RequestBody User user) {
-        log.info(text, "Добавить пользователя", user);
-        checkEmail(user);
-        User user1 = user.toBuilder().id(++generatorID).build();
-        User changedUser = setUpName(user1);
-        usersData.put(generatorID, changedUser);
-        log.info("Пользователь добавлен: {}", user1);
-        return changedUser;
+        return userService.addUser(user);
     }
 
     @PutMapping
     public User putUser(@Valid @RequestBody User user) {
-        log.info(text, "Обновить пользователя", user);
-        User oldUser = usersData.get(user.getId());
-        if (oldUser == null) {
-            log.warn(text, "Нельзя обновить пользователя с несуществующим id. ", user);
-            throw new ValidationException("Нельзя обновить несуществующего пользователя");
-        }
-
-        if (!oldUser.getEmail().equals(user.getEmail())) {
-            checkEmail(user);
-        }
-        usersData.put(user.getId(), user);
-        log.info("Пользователь обновлен: {}", user);
-
-        return user;
+        return userService.updateUser(user);
     }
 
-    private User setUpName(User user) {
-        if (user.getName() == null || user.getName().trim().isBlank()) {
-            return user.toBuilder().name(user.getLogin()).build();
-        }
-        return user;
+    @GetMapping("/{id}")
+    public User getUserByID(@PathVariable Integer id) {
+        return userService.findUser(id);
     }
 
-    private void checkEmail(User user) {
-        boolean condition = usersData.values().stream()
-                .anyMatch(a -> a.getEmail().equals(user.getEmail()));
+    @DeleteMapping("/{id}")
+    public User delUserByID(@PathVariable Integer id) {
+        return userService.deleteUser(id);
+    }
 
-        if (condition) {
-            log.warn("Такой email занят: {}", user.getEmail());
-            throw new ValidationException("Такой email занят");
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable("id") Integer id1, @PathVariable("friendId") Integer id2) {
+        userService.manageFriendship(id1, id2, UserService.FriendshipMethod.ADD);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable("id") Integer id1, @PathVariable("friendId") Integer id2) {
+        userService.manageFriendship(id1, id2, UserService.FriendshipMethod.DEL);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getUserFriend(@PathVariable Integer id) {
+        return userService.getUserFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getMutualFriends(@PathVariable("id") Integer id1, @PathVariable("otherId") Integer id2) {
+        return userService.getMutualFriends(id1, id2);
     }
 }
