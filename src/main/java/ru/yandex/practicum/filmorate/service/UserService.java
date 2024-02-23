@@ -83,8 +83,8 @@ public class UserService {
         List<User> friendsOfUser = user.getFriends().stream()
                 .map(userID -> findUser(userID))
                 .collect(Collectors.toList());
-        log.info("Обработан запрос на получения списка друзей пользователя с id = {}. Список друзей: {}"
-                , id, friendsOfUser);
+        log.info("Обработан запрос на получения списка друзей пользователя с id = {}. Список друзей: {}",
+                id, friendsOfUser);
         return friendsOfUser;
     }
 
