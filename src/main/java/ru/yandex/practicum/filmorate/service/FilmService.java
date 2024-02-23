@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
 public class FilmService {
     private int generatorID = 0;
 
-    final private FilmStorage filmStorage;
-    final private UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
