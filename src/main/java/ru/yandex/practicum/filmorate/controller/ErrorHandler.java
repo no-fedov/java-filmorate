@@ -43,7 +43,9 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, List<String>> handleNoValidRequestBodyException(final MethodArgumentNotValidException e) {
         List<String> descriptionViolations = e.getFieldErrors().stream()
-                .map(x -> { return x.getField() + " -> " + x.getDefaultMessage();})
+                .map(x -> {
+                    return x.getField() + " -> " + x.getDefaultMessage();
+                })
                 .collect(Collectors.toList());
         log.warn("Тело запроса содержит невалидные данные: {}.", descriptionViolations);
         return Map.of("Тело запроса содержит некорректные данные", descriptionViolations);
