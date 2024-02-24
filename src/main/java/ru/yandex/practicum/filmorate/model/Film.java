@@ -24,7 +24,6 @@ public class Film {
     @NotBlank(message = "У фильма должно быть описание")
     private String description;
 
-    @NotNull
     @DateRelease
     private LocalDate releaseDate;
 

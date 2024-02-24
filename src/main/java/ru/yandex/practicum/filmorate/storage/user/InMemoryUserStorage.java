@@ -3,20 +3,19 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Repository
 class InMemoryUserStorage implements UserStorage {
+    private int generatorID = 0;
     private final Map<Integer, User> userStorage = new HashMap<>();
 
     @Override
     public User addUser(User user) {
-        userStorage.put(user.getId(), user);
-        return user;
+        User newUser = user.toBuilder().id(generateID()).build();
+        userStorage.put(newUser.getId(), newUser);
+        return newUser;
     }
 
     @Override
@@ -25,8 +24,14 @@ class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findUser(Integer id) {
-        return userStorage.get(id);
+    public Optional<User> findUser(Integer id) {
+        return Optional.ofNullable(userStorage.get(id));
+    }
+
+    @Override
+    public User updateUser(User user) {
+        userStorage.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -43,5 +48,9 @@ class InMemoryUserStorage implements UserStorage {
             }
         }
         return users;
+    }
+
+    private int generateID() {
+        return ++generatorID;
     }
 }

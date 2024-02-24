@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -14,33 +15,23 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
-    private int generatorID = 0;
 
     private final UserStorage userStorage;
 
-    private int generateID() {
-        return ++generatorID;
-    }
-
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
     public User addUser(User user) {
         checkEmail(user);
-        User newUser = user.toBuilder().id(generateID()).build();
-        User userWithName = setUpName(newUser);
-        log.info("Добавлен новый пользователь: {}", user);
-        return userStorage.addUser(userWithName);
+        User userWithName = setUpName(user);
+        User newUser = userStorage.addUser(userWithName);
+        log.info("Добавлен новый пользователь: {}", newUser);
+        return newUser;
     }
 
     public User findUser(Integer id) {
-        User user = userStorage.findUser(id);
-        if (user == null) {
-            log.warn("Ошибка при выполнении запроса. Пользователь с id = {} не существует", id);
-            throw new UserNotFoundException("Пользователь с id = " + id + "не найден");
-        }
+        User user = userStorage.findUser(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + "не найден"));
+        log.info("Обработан запрос по поиску пользователя. Найден пользователь: {}", user);
         return user;
     }
 
@@ -50,8 +41,9 @@ public class UserService {
         if (!oldUser.getEmail().equals(user.getEmail())) {
             checkEmail(user);
         }
+
         log.info("Обновлен пользователь: {}", user);
-        return userStorage.addUser(user);
+        return userStorage.updateUser(user);
     }
 
     public User deleteUser(Integer id) {
@@ -99,7 +91,7 @@ public class UserService {
                 .map(userID -> findUser(userID))
                 .collect(Collectors.toList());
 
-        log.info("Обработан запрос на получение общий друзей пользователя № {} и № {}", id1, id2);
+        log.info("Обработан запрос на получение общих друзей пользователя № {} и № {}", id1, id2);
         return mutualFriends;
     }
 
@@ -120,7 +112,7 @@ public class UserService {
 
         if (condition) {
             log.warn("Ошибка при выполнении запроса. Такой email занят: {}", user.getEmail());
-            throw new ValidationException("Email занят" + user.getEmail());
+            throw new ValidationException("Этот Email занят: " + user.getEmail());
         }
     }
 

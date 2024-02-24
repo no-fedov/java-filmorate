@@ -3,21 +3,20 @@ package ru.yandex.practicum.filmorate.storage.film;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Repository
 class InMemoryFilmStorage implements FilmStorage {
 
+    private int generatorID = 0;
     private final Map<Integer, Film> filmStorage = new HashMap<>();
 
     @Override
     public Film addFilm(Film film) {
-        filmStorage.put(film.getId(), film);
-        return film;
+        Film newFilm = film.toBuilder().id(generateID()).build();
+        filmStorage.put(newFilm.getId(), newFilm);
+        return newFilm;
     }
 
     @Override
@@ -26,8 +25,14 @@ class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findFilm(Integer id) {
-        return filmStorage.get(id);
+    public Optional<Film> findFilm(Integer id) {
+        return Optional.ofNullable(filmStorage.get(id));
+    }
+
+    @Override
+    public Film updateFilm(Film film) {
+        filmStorage.put(film.getId(), film);
+        return film;
     }
 
     @Override
@@ -44,5 +49,9 @@ class InMemoryFilmStorage implements FilmStorage {
             }
         }
         return films;
+    }
+
+    private int generateID() {
+        return ++generatorID;
     }
 }
