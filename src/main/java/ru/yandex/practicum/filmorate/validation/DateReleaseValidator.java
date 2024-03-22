@@ -5,7 +5,7 @@ import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
 public class DateReleaseValidator implements ConstraintValidator<DateRelease, LocalDate> {
-    LocalDate firstDateRelease = LocalDate.of(1895, 12, 28);
+    private static LocalDate firstDateRelease = LocalDate.of(1895, 12, 28);
 
     @Override
     public void initialize(DateRelease constraintAnnotation) {
