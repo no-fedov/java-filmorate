@@ -41,9 +41,10 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         SqlRowSet rs = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         while (rs.next()) {
-            listGenre.add(Genre.builder().
-                    id(rs.getInt("genre_id")).
-                    name(rs.getString("name")).build());
+            listGenre.add(Genre.builder()
+                    .id(rs.getInt("genre_id"))
+                    .name(rs.getString("name"))
+                    .build());
         }
 
         return listGenre;
