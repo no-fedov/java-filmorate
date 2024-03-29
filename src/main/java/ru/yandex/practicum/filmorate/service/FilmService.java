@@ -93,7 +93,8 @@ public class FilmService {
 
     public List<Film> getAllFilm() {
 
-        List<Film> listFilm = filmDbStorage.getAllFilm().stream().
+        List<Film> listFilm = filmDbStorage.getAllFilm().
+                stream().
                 peek(film -> {
                     film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
                     film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
@@ -115,7 +116,8 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilmList(Integer count) {
-        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count).stream().
+        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count).
+                stream().
                 peek(film -> {
                     film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
                     film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
@@ -137,7 +139,6 @@ public class FilmService {
     }
 
     private MPA findMPAtoFilm(Film film) {
-        // проверить МПА рейтинг на существование
         int mpaID = film.getMpa().getId();
         MPA mpa = mpaStorage.findMPA(mpaID).
                 orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий MPA рейтинг"));
@@ -145,11 +146,11 @@ public class FilmService {
     }
 
     private Set<Genre> findGenresToFilm(Film film) {
-        // проверяем существование жанров
         Set<Genre> genres = new HashSet<>();
 
         for (Genre genre : film.getGenres()) {
-            genres.add(genreStorage.findGenre(genre.getId()).
+            genres.add(genreStorage.
+                    findGenre(genre.getId()).
                     orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий жанр")));
         }
 
