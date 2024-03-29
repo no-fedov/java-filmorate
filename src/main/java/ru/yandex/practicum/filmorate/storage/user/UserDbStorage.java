@@ -42,7 +42,9 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
+        log.info("У пользователя был айди равный = {}", user.getId());
         int id = keyHolder.getKey().intValue();
+        log.info("fqlb нового пользователя  , будет равен = {}", id);
 
         User addedUser = findUser(id).get();
 
