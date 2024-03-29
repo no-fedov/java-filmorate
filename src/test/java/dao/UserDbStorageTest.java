@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipDbStorage;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
@@ -23,9 +21,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
-
-@JdbcTest
-@ContextConfiguration(classes = {FilmorateApplication.class})
+@SpringBootTest
+@AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
 public class UserDbStorageTest {
@@ -51,14 +48,12 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void check_addUser_shouldAddUser() {
         User newUser = userDbStorage.addUser(user);
         assertEquals(user, newUser);
     }
 
     @Test
-    @Transactional
     public void check_updateUser_shouldUpdate() {
         User newUser = user.toBuilder().birthday(LocalDate.of(2000, 11, 11)).build();
         userDbStorage.addUser(user);
@@ -67,7 +62,6 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void check_findUser_shouldFind() {
         userDbStorage.addUser(user);
         User findUser = userDbStorage.findUser(1).get();
@@ -75,7 +69,6 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void check_deleteUser_shouldDelete() {
         userDbStorage.addUser(user);
         User deletedUser = userDbStorage.deleteUser(1);
@@ -83,7 +76,6 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void check_getAllUsers_shouldReturnListSize_3() {
         User user2 = user.toBuilder().name("Alex").email("refds@mail.ru").build();
         User user3 = user.toBuilder().name("loky").email("sdgfsdgafdg@mail.ru").build();
@@ -98,7 +90,6 @@ public class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void check_user1_Friendship_to_user2() {
         User user2 = user.toBuilder().name("Alex").email("refds@mail.ru").build();
 
