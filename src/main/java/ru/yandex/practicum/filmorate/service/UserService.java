@@ -23,8 +23,10 @@ public class UserService {
     private final FriendshipStorage friendshipStorage;
 
     public User addUser(User user) {
+        log.info("{}",user);
         checkEmail(user);
         User userWithName = setUpName(user);
+        log.info("{}",user);
         User newUser = userDbStorage.addUser(userWithName);
         log.info("Добавлен новый пользователь: {}", newUser);
         return newUser;
