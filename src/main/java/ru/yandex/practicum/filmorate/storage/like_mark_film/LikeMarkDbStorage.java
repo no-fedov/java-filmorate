@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.like_mark_film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 
 @Repository("likeMarkDbStorage")
 @RequiredArgsConstructor
