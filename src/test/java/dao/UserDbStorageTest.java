@@ -37,8 +37,8 @@ public class UserDbStorageTest {
 
     @BeforeEach
     public void init() {
-        user = User.builder().
-                id(1)
+        user = User.builder()
+                .id(1)
                 .name("java")
                 .email("developer@mail.ru")
                 .login("baobab")
