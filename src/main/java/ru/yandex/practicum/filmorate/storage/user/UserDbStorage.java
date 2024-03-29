@@ -2,17 +2,17 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -25,23 +25,12 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User addUser(User user) {
 
-        String sqlQuery = "INSERT INTO user_filmorate(name, login, email, birthday) " +
-                "VALUES (?, ?, ?, ?)";
+        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("user_filmorate")
+                .usingGeneratedKeyColumns("id");
+        Number id = simpleJdbcInsert.executeAndReturnKey(userToMap(user));
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"id"});
-            stmt.setString(1, user.getName());
-            stmt.setString(2, user.getLogin());
-            stmt.setString(3, user.getEmail());
-            stmt.setDate(4, Date.valueOf(user.getBirthday()));
-            return stmt;
-        }, keyHolder);
-
-        int id = keyHolder.getKey().intValue();
-
-        return findUser(id).get();
+        return findUser((Integer) id).get();
     }
 
     @Override
@@ -79,6 +68,15 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> findUserByCondition(Predicate<User> condition) {
         return null;
+    }
+
+    private Map<String, Object> userToMap(User user) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", user.getEmail());
+        values.put("name", user.getName());
+        values.put("login", user.getLogin());
+        values.put("birthday", Date.valueOf(user.getBirthday()));
+        return values;
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
