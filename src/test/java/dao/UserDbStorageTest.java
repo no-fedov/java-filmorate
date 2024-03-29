@@ -38,11 +38,11 @@ public class UserDbStorageTest {
     @BeforeEach
     public void init() {
         user = User.builder().
-                id(1).
-                name("java").
-                email("developer@mail.ru").
-                login("baobab").
-                birthday(LocalDate.of(1999, 12, 1))
+                id(1)
+                .name("java")
+                .email("developer@mail.ru")
+                .login("baobab")
+                .birthday(LocalDate.of(1999, 12, 1))
                 .build();
 
         userDbStorage = new UserDbStorage(jdbcTemplate);
@@ -95,8 +95,8 @@ public class UserDbStorageTest {
     public void check_user1_Friendship_to_user2() {
         User user2 = user.toBuilder().name("Alex").email("refds@mail.ru").build();
 
-        User user1_InDb = userDbStorage.addUser(user);
-        User user2_InDb = userDbStorage.addUser(user2);
+        User user1InDb = userDbStorage.addUser(user);
+        User user2InDb = userDbStorage.addUser(user2);
 
         friendshipStorage.addFriend(1, 2);
 
@@ -108,13 +108,13 @@ public class UserDbStorageTest {
 
         User friend = listFriendUser1.get(0);
 
-        assertEquals(user2_InDb, friend);
+        assertEquals(user2InDb, friend);
 
         int countFriendUser2 = friendshipStorage.getUserFriends(2).size();
 
         assertEquals(0, countFriendUser2);
 
-        friendshipStorage.addFriend(2,1);
+        friendshipStorage.addFriend(2, 1);
 
         List<User> listFriendUser2 = friendshipStorage.getUserFriends(2);
 
@@ -122,6 +122,6 @@ public class UserDbStorageTest {
 
         assertEquals(1, size);
 
-        assertEquals(user1_InDb, listFriendUser2.get(0));
+        assertEquals(user1InDb, listFriendUser2.get(0));
     }
 }
