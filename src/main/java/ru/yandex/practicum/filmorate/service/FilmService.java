@@ -93,9 +93,8 @@ public class FilmService {
 
     public List<Film> getAllFilm() {
 
-        List<Film> listFilm = filmDbStorage.getAllFilm().
-                stream().
-                peek(film -> {
+        List<Film> listFilm = filmDbStorage.getAllFilm().stream()
+                .peek(film -> {
                     film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
                     film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
                 })
@@ -116,9 +115,9 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilmList(Integer count) {
-        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count).
-                stream().
-                peek(film -> {
+        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count)
+                .stream()
+                .peek(film -> {
                     film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
                     film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
                 })
@@ -140,8 +139,8 @@ public class FilmService {
 
     private MPA findMPAtoFilm(Film film) {
         int mpaID = film.getMpa().getId();
-        MPA mpa = mpaStorage.findMPA(mpaID).
-                orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий MPA рейтинг"));
+        MPA mpa = mpaStorage.findMPA(mpaID)
+                .orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий MPA рейтинг"));
         return mpa;
     }
 
@@ -149,9 +148,9 @@ public class FilmService {
         Set<Genre> genres = new HashSet<>();
 
         for (Genre genre : film.getGenres()) {
-            genres.add(genreStorage.
-                    findGenre(genre.getId()).
-                    orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий жанр")));
+            genres.add(genreStorage
+                    .findGenre(genre.getId())
+                    .orElseThrow(() -> new NotExistEntity("При добавлении фильма вы указали несуществующий жанр")));
         }
 
         film.addGenre(genres);
