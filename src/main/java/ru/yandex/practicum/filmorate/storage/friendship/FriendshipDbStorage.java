@@ -51,12 +51,12 @@ public class FriendshipDbStorage implements FriendshipStorage {
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
-        return User.builder().
-                id(resultSet.getInt("id")).
-                name(resultSet.getString("name")).
-                login(resultSet.getString("login")).
-                email(resultSet.getString("email")).
-                birthday(resultSet.getDate("birthday").toLocalDate())
+        return User.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .login(resultSet.getString("login"))
+                .email(resultSet.getString("email"))
+                .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
     }
 

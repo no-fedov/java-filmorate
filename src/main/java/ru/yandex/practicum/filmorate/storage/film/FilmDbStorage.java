@@ -84,13 +84,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder().
-                id(resultSet.getInt("id")).
-                name(resultSet.getString("name")).
-                description(resultSet.getString("description")).
-                duration(resultSet.getInt("duration")).
-                releaseDate(resultSet.getDate("release_date").toLocalDate()).
-                rate(resultSet.getInt("rate"))
+        return Film.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .description(resultSet.getString("description"))
+                .duration(resultSet.getInt("duration"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .rate(resultSet.getInt("rate"))
                 .build();
     }
 }
