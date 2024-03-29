@@ -19,17 +19,17 @@ public class FriendshipDbStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public void addFriend(int id_1, int id_2) {
+    public void addFriend(int id1, int id2) {
         String sqlQuery = "INSERT INTO friendship(user_id, friend_id) " +
                 "VALUES(?, ?)";
 
-        jdbcTemplate.update(sqlQuery, id_1, id_2);
+        jdbcTemplate.update(sqlQuery, id1, id2);
     }
 
     @Override
-    public void deleteFriend(int id_1, int id_2) {
+    public void deleteFriend(int id1, int id2) {
         String sqlQuery = "DELETE FROM friendship WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(sqlQuery, id_1, id_2);
+        jdbcTemplate.update(sqlQuery, id1, id2);
     }
 
     @Override
@@ -40,14 +40,14 @@ public class FriendshipDbStorage implements FriendshipStorage {
     }
 
     @Override
-    public List<User> getMutualFriendsList(int id_1, int id_2) {
+    public List<User> getMutualFriendsList(int id1, int id2) {
 
         String sqlQuery = "SELECT fr1.friend_id " +
                 "FROM friendship AS fr1 " +
                 "INNER JOIN friendship AS fr2 ON fr1.friend_id = fr2.friend_id " +
                 "WHERE fr1.user_id = ? AND fr2.user_id = ?";
 
-        return getUsers(sqlQuery, new Object[]{id_1, id_2});
+        return getUsers(sqlQuery, new Object[]{id1, id2});
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
