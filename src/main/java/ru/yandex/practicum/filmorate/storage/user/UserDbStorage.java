@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -43,7 +44,7 @@ public class UserDbStorage implements UserStorage {
         }, keyHolder);
 
         log.info("У пользователя был айди равный = {}", user.getId());
-        int id = keyHolder.getKey().intValue();
+        int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
         log.info("fqlb нового пользователя  , будет равен = {}", id);
 
         User addedUser = findUser(id).get();

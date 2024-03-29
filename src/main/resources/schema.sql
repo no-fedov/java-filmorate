@@ -44,10 +44,5 @@ CREATE TABLE IF NOT EXISTS like_mark_film (
   PRIMARY KEY (film_id, user_id)
 );
 
-MERGE INTO rating_mpa (name) KEY(name) VALUES
-    ('G'), ('PG'), ('PG-13'), ('R'), ('NC-17');
-
-MERGE INTO genre (name) KEY(name) VALUES
-    ('Комедия'), ('Драма'), ('Мультфильм'), ('Триллер'), ('Документальный'), ('Боевик');
 
 
