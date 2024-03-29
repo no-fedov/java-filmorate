@@ -79,18 +79,18 @@ public class MPADbStorage implements MPAStorage {
         MPA mpa = null;
 
         if (rs.next()) {
-            mpa = MPA.builder().
-                    id(rs.getInt("id")).
-                    name(rs.getString("name")).
-                    build();
+            mpa = MPA.builder()
+                    .id(rs.getInt("id"))
+                    .name(rs.getString("name"))
+                    .build();
         }
         return mpa;
     }
 
     private MPA mapRowToMPA(ResultSet resultSet, int rowNum) throws SQLException {
-        return MPA.builder().
-                id(resultSet.getInt("id")).
-                name(resultSet.getString("name")).
-                build();
+        return MPA.builder()
+                .id(resultSet.getInt("id"))
+                .name(resultSet.getString("name"))
+                .build();
     }
 }
