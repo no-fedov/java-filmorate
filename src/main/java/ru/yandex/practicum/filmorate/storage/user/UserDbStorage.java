@@ -75,7 +75,7 @@ public class UserDbStorage implements UserStorage {
         values.put("email", user.getEmail());
         values.put("name", user.getName());
         values.put("login", user.getLogin());
-        values.put("birthday", Date.valueOf(user.getBirthday()));
+        values.put("birthday", user.getBirthday());
         return values;
     }
 
