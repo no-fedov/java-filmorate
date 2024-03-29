@@ -41,7 +41,7 @@ public class UserDbStorage implements UserStorage {
 
         int id = keyHolder.getKey().intValue();
 
-        return user.toBuilder().id(id).build();
+        return findUser(id).get();
     }
 
     @Override
