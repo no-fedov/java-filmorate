@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 import java.util.function.Predicate;
 
-@Repository
+@Repository("inMemoryUserStorage")
 class InMemoryUserStorage implements UserStorage {
     private int generatorID = 0;
     private final Map<Integer, User> userStorage = new HashMap<>();

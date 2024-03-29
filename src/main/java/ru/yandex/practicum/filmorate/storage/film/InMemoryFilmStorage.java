@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.*;
 import java.util.function.Predicate;
 
-@Repository
+@Repository("inMemoryFilmStorage")
 class InMemoryFilmStorage implements FilmStorage {
 
     private int generatorID = 0;
@@ -38,6 +38,11 @@ class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilm() {
         return new ArrayList<>(filmStorage.values());
+    }
+
+    @Override
+    public List<Film> getAllPopularFilm(int count) {
+        return null;
     }
 
     @Override

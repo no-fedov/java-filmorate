@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class UserFilmorateApplicationTests {
     private ObjectMapper objectMapper;
 
     @Test
+    @Transactional
     public void check_PostUser_WithBadEmail() throws Exception {
         User user = User.builder()
                 .name("Andrei")
@@ -62,6 +64,7 @@ public class UserFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostUser_WithoutLogin() throws Exception {
         User user = User.builder()
                 .name("Andrei")
@@ -101,6 +104,7 @@ public class UserFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostUser_WithEmptyName() throws Exception {
         User user = User.builder()
                 .name("")
@@ -140,6 +144,7 @@ public class UserFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostUser_BirthDayInFuture() throws Exception {
         User user = User.builder()
                 .name("")

@@ -17,5 +17,7 @@ public interface FilmStorage {
 
     List<Film> getAllFilm();
 
+    List<Film> getAllPopularFilm(int count);
+
     List<Film> findFilmByCondition(Predicate<Film> condition);
 }

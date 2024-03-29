@@ -6,6 +6,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.NotExistEntity;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
@@ -22,6 +23,13 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationException(final ValidationException e) {
         log.warn("Ошибка при изменении/добавлении email. {}.", e.getMessage());
+        return Map.of("Ошибка при запросе: ", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String,String> handleNotExistEntity(final NotExistEntity e) {
+        log.warn("Ошибка при выполнении запроса: {}.", e.getMessage());
         return Map.of("Ошибка при запросе: ", e.getMessage());
     }
 
