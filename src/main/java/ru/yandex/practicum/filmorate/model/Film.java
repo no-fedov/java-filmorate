@@ -34,7 +34,7 @@ public class Film {
 
     private MPA mpa;
 
-    private final Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId,Comparator.naturalOrder()));
+    private final Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
 
     public void likeFilm() {
         rate++;
