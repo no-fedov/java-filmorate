@@ -1,37 +1,32 @@
-package dao;
+package ru.yandex.practicum.filmorate.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friendship.FriendshipDbStorage;
-import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD;
 
-@SpringBootTest
-@AutoConfigureTestDatabase
+
+
+@JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DirtiesContext(classMode = BEFORE_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserDbStorageTest {
 
     private final JdbcTemplate jdbcTemplate;
-    private UserStorage userDbStorage;
-    private FriendshipStorage friendshipStorage;
-
     private User user;
+
 
     @BeforeEach
     public void init() {
@@ -42,19 +37,18 @@ public class UserDbStorageTest {
                 .login("baobab")
                 .birthday(LocalDate.of(1999, 12, 1))
                 .build();
-
-        userDbStorage = new UserDbStorage(jdbcTemplate);
-        friendshipStorage = new FriendshipDbStorage(jdbcTemplate);
     }
 
     @Test
     public void check_addUser_shouldAddUser() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         User newUser = userDbStorage.addUser(user);
         assertEquals(user, newUser);
     }
 
     @Test
     public void check_updateUser_shouldUpdate() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         User newUser = user.toBuilder().birthday(LocalDate.of(2000, 11, 11)).build();
         userDbStorage.addUser(user);
         User updatedUser = userDbStorage.updateUser(newUser);
@@ -63,6 +57,7 @@ public class UserDbStorageTest {
 
     @Test
     public void check_findUser_shouldFind() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         userDbStorage.addUser(user);
         User findUser = userDbStorage.findUser(1).get();
         assertEquals(user, findUser);
@@ -70,6 +65,7 @@ public class UserDbStorageTest {
 
     @Test
     public void check_deleteUser_shouldDelete() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         userDbStorage.addUser(user);
         User deletedUser = userDbStorage.deleteUser(1);
         assertEquals(user, deletedUser);
@@ -77,6 +73,7 @@ public class UserDbStorageTest {
 
     @Test
     public void check_getAllUsers_shouldReturnListSize_3() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
         User user2 = user.toBuilder().name("Alex").email("refds@mail.ru").build();
         User user3 = user.toBuilder().name("loky").email("sdgfsdgafdg@mail.ru").build();
 
@@ -91,14 +88,16 @@ public class UserDbStorageTest {
 
     @Test
     public void check_user1_Friendship_to_user2() {
+        UserDbStorage userDbStorage = new UserDbStorage(jdbcTemplate);
+        FriendshipDbStorage friendshipDbStorage = new FriendshipDbStorage(jdbcTemplate);
         User user2 = user.toBuilder().name("Alex").email("refds@mail.ru").build();
 
         User user1InDb = userDbStorage.addUser(user);
         User user2InDb = userDbStorage.addUser(user2);
 
-        friendshipStorage.addFriend(1, 2);
+        friendshipDbStorage.addFriend(1, 2);
 
-        List<User> listFriendUser1 = friendshipStorage.getUserFriends(1);
+        List<User> listFriendUser1 = friendshipDbStorage.getUserFriends(1);
 
         int countFriendUser1 = listFriendUser1.size();
 
@@ -108,13 +107,13 @@ public class UserDbStorageTest {
 
         assertEquals(user2InDb, friend);
 
-        int countFriendUser2 = friendshipStorage.getUserFriends(2).size();
+        int countFriendUser2 = friendshipDbStorage.getUserFriends(2).size();
 
         assertEquals(0, countFriendUser2);
 
-        friendshipStorage.addFriend(2, 1);
+        friendshipDbStorage.addFriend(2, 1);
 
-        List<User> listFriendUser2 = friendshipStorage.getUserFriends(2);
+        List<User> listFriendUser2 = friendshipDbStorage.getUserFriends(2);
 
         int size = listFriendUser2.size();
 
