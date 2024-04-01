@@ -6,31 +6,33 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friendship.FriendshipStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserStorage userStorage;
+    private final UserStorage userDbStorage;
+
+    private final FriendshipStorage friendshipStorage;
 
     public User addUser(User user) {
+        log.info("{}",user);
         checkEmail(user);
         User userWithName = setUpName(user);
-        User newUser = userStorage.addUser(userWithName);
+        log.info("{}",user);
+        User newUser = userDbStorage.addUser(userWithName);
         log.info("Добавлен новый пользователь: {}", newUser);
         return newUser;
     }
 
     public User findUser(Integer id) {
-        User user = userStorage.findUser(id)
-                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + "не найден"));
+        User user = userDbStorage.findUser(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id = " + id + " не найден"));
         log.info("Обработан запрос по поиску пользователя. Найден пользователь: {}", user);
         return user;
     }
@@ -43,13 +45,13 @@ public class UserService {
         }
 
         log.info("Обновлен пользователь: {}", user);
-        return userStorage.updateUser(user);
+        return userDbStorage.updateUser(user);
     }
 
     public User deleteUser(Integer id) {
         User deletedUser = findUser(id);
         log.info("Пользователь удален {}", deletedUser);
-        return userStorage.deleteUser(id);
+        return userDbStorage.deleteUser(id);
     }
 
     public void manageFriendship(Integer id1, Integer id2, FriendshipMethod nameMethod) {
@@ -58,45 +60,38 @@ public class UserService {
 
         switch (nameMethod) {
             case ADD:
-                user1.getFriends().add(id2);
-                user2.getFriends().add(id1);
-                log.info("Эти пользователи теперь друзья: {} и {}", user1, user2);
+                friendshipStorage.addFriend(id1, id2);
+                log.info("Пользователь № {} отправил заявку в друзья пользователю № {}", id1, id2);
                 break;
             case DEL:
-                user1.getFriends().remove(id2);
-                user2.getFriends().remove(id1);
+                friendshipStorage.deleteFriend(id1, id2);
                 log.info("Эти пользователи теперь не друзья: {} и {}", user1, user2);
                 break;
         }
     }
 
     public List<User> getUserFriends(Integer id) {
-        User user = findUser(id);
-        List<User> friendsOfUser = user.getFriends().stream()
-                .map(userID -> findUser(userID))
-                .collect(Collectors.toList());
+        findUser(id);
+        List<User> friendList = friendshipStorage.getUserFriends(id);
         log.info("Обработан запрос на получения списка друзей пользователя с id = {}. Список друзей: {}",
-                id, friendsOfUser);
-        return friendsOfUser;
+                id, friendList);
+        return friendList;
     }
 
     public List<User> getMutualFriends(Integer id1, Integer id2) {
-        Set<Integer> friendsUser1 = findUser(id1).getFriends();
-        Set<Integer> friendsUser2 = findUser(id2).getFriends();
+        findUser(id1);
+        findUser(id2);
 
-        Set<Integer> intersection = new HashSet<>(friendsUser1);
-        intersection.retainAll(friendsUser2);
-
-        List<User> mutualFriends = intersection.stream()
-                .map(userID -> findUser(userID))
-                .collect(Collectors.toList());
-
+        List<User> mutualFriends = friendshipStorage.getMutualFriendsList(id1, id2);
         log.info("Обработан запрос на получение общих друзей пользователя № {} и № {}", id1, id2);
+
         return mutualFriends;
     }
 
     public List<User> getAllUser() {
-        return userStorage.getAllUser();
+        List<User> listUser = userDbStorage.getAllUser();
+        log.info("Обработан запрос на получение всех пользователей {}", listUser);
+        return listUser;
     }
 
     private User setUpName(User user) {
@@ -107,7 +102,7 @@ public class UserService {
     }
 
     private void checkEmail(User user) {
-        boolean condition = userStorage.getAllUser().stream()
+        boolean condition = userDbStorage.getAllUser().stream()
                 .anyMatch(a -> a.getEmail().equals(user.getEmail()));
 
         if (condition) {

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.NestedServletException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -20,6 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class FilmFilmorateApplicationTests {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -27,6 +29,7 @@ public class FilmFilmorateApplicationTests {
     private ObjectMapper objectMapper;
 
     @Test
+    @Transactional
     public void check_PostFilm_WithEmptyName() throws Exception {
         Film film = Film.builder()
                 .name("")
@@ -66,6 +69,7 @@ public class FilmFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostFilm_DescriptionMoreThen200() throws Exception {
         StringBuilder string = new StringBuilder();
         for (int i = 0; i < 200; i++) {
@@ -86,6 +90,7 @@ public class FilmFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostFilm_DurationNegative() throws Exception {
         Film film = Film.builder()
                 .name("COOL FILM")
@@ -101,6 +106,7 @@ public class FilmFilmorateApplicationTests {
     }
 
     @Test
+    @Transactional
     public void check_PostFilm_ReleaseDateIsBad() throws Exception {
         Film film = Film.builder()
                 .name("Film")

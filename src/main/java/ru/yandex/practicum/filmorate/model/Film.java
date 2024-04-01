@@ -6,8 +6,7 @@ import ru.yandex.practicum.filmorate.validation.DateRelease;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Film.
@@ -30,5 +29,29 @@ public class Film {
     @PositiveOrZero(message = "Продолжительность фильма должна быть положительной")
     private int duration;
 
-    private final Set<Integer> like = new HashSet<>();
+    @PositiveOrZero
+    private int rate;
+
+    @NotNull
+    private MPA mpa;
+
+    private final Set<Genre> genres = new LinkedHashSet<>();
+//            new TreeSet<>(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
+
+    public void likeFilm() {
+        rate++;
+    }
+
+    public void unlikeFilm() {
+        rate--;
+    }
+
+    public void addGenre(Set<Genre> genres) {
+        this.genres.addAll(genres);
+    }
+
+    public void deleteGenre(Set<Genre> genres) {
+        this.genres.removeAll(genres);
+    }
+
 }
