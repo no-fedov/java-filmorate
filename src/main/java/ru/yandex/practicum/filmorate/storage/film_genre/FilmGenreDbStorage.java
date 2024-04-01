@@ -86,7 +86,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
     @Override
     public Set<Genre> removeGenreFromFilm(Film film, List<Genre> genres) {
 
-        if(genres == null) {
+        if (genres == null) {
             return new LinkedHashSet<>();
         }
 
