@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -13,9 +14,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-@Repository("filmDbStorage")
+@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
@@ -27,14 +27,13 @@ public class FilmDbStorage implements FilmStorage {
 
         Map<String, Object> columns = new SimpleJdbcInsert(this.jdbcTemplate)
                 .withTableName("film")
-                .usingColumns("name", "description", "duration", "release_date", "rating_id", "rate")
+                .usingColumns("name", "description", "duration", "release_date", "rating_id")
                 .usingGeneratedKeyColumns("id")
                 .executeAndReturnKeyHolder(Map.of("name", film.getName(),
                         "description", film.getDescription(),
                         "duration", film.getDuration(),
                         "release_date", Date.valueOf(film.getReleaseDate()),
-                        "rating_id", film.getMpa().getId(),
-                        "rate", film.getRate()))
+                        "rating_id", film.getMpa().getId()))
                 .getKeys();
 
         Film createdFilm = film.toBuilder().id((Integer) columns.get("id")).build();
@@ -52,7 +51,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> findFilm(Integer id) {
-        List<Film> films = jdbcTemplate.query("SELECT * FROM film WHERE id = ?",
+
+        List<Film> films = jdbcTemplate.query("SELECT f.*, mpa.id AS mpa_id, mpa.name AS mpa_name " +
+                        "FROM film f " +
+                        "JOIN rating_mpa mpa ON f.rating_id = mpa.id " +
+                        "WHERE f.id = ?",
                 new Object[]{id},
                 this::mapRowToFilm);
         return films.stream().findFirst();
@@ -61,26 +64,30 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film updateFilm(Film film) {
         String sqlQuery = "UPDATE film " +
-                "SET name = ?, description = ?, duration = ?, release_date = ?, rating_id = ?, rate = ? " +
+                "SET name = ?, description = ?, duration = ?, release_date = ?, rating_id = ? " +
                 "WHERE id = ?";
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getDuration(), film.getReleaseDate(),
-                film.getMpa().getId(), film.getRate(), film.getId());
+                film.getMpa().getId(), film.getId());
 
         return film;
     }
 
     @Override
     public List<Film> getAllFilm() {
-        return jdbcTemplate.query("SELECT * FROM film", this::mapRowToFilm);
+        return jdbcTemplate.query("SELECT f.*, mpa.name AS mpa_name " +
+                "FROM film AS f " +
+                "INNER JOIN rating_mpa AS mpa ON f.rating_id = mpa.id", this::mapRowToFilm);
     }
 
+
+    //Переписать метод
     public List<Film> getAllPopularFilm(int cout) {
-        return jdbcTemplate.query("SELECT * FROM film ORDER BY rate DESC LIMIT ?", this::mapRowToFilm, cout);
-    }
-
-    @Override
-    public List<Film> findFilmByCondition(Predicate<Film> condition) {
-        return null;
+        return jdbcTemplate.query("SELECT f.*, mpa.name AS mpa_name, COUNT(lmf.user_id) AS rating " +
+                "FROM film AS f " +
+                "INNER JOIN like_mark_film AS lmf ON f.id = lmf.film_id " +
+                "INNER JOIN rating_mpa AS mpa ON f.rating_id = mpa.id " +
+                "GROUP BY f.id " +
+                "ORDER BY rating DESC LIMIT ?", this::mapRowToFilm, cout);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -90,7 +97,8 @@ public class FilmDbStorage implements FilmStorage {
                 .description(resultSet.getString("description"))
                 .duration(resultSet.getInt("duration"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .rate(resultSet.getInt("rate"))
+                .mpa(MPA.builder().id(resultSet.getInt("rating_id"))
+                        .name(resultSet.getString("mpa_name")).build())
                 .build();
     }
 }

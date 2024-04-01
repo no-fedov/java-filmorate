@@ -16,9 +16,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
-@Repository("userDbStorage")
+@Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserDbStorage implements UserStorage {
@@ -27,7 +26,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User addUser(User user) {
-        log.info("Постукпил пользователь на добавление {} ", user);
+        log.info("Поступил пользователь на добавление {} ", user);
 
         String sqlQuery = "INSERT INTO user_filmorate(name, login, email, birthday) " +
                 "VALUES (?, ?, ?, ?)";
@@ -43,15 +42,9 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
-        log.info("У пользователя был айди равный = {}", user.getId());
         int id = Objects.requireNonNull(keyHolder.getKey()).intValue();
-        log.info("fqlb нового пользователя  , будет равен = {}", id);
 
-        User addedUser = findUser(id).get();
-
-        log.info("Добавили его {}", addedUser);
-
-        return addedUser;
+        return user.toBuilder().id(id).build();
     }
 
     @Override
@@ -72,23 +65,18 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         String sqlQuery = "UPDATE user_filmorate " +
-                "SET name = ?, login = ?, email = ?, birthday = ?" +
+                "SET name = ?, login = ?, email = ?, birthday = ? " +
                 "WHERE id = ?";
 
         jdbcTemplate.update(sqlQuery, user.getName(), user.getLogin(), user.getEmail(),
                 user.getBirthday(), user.getId());
 
-        return findUser(user.getId()).get();
+        return user;
     }
 
     @Override
     public List<User> getAllUser() {
         return jdbcTemplate.query("SELECT * FROM user_filmorate ORDER BY id", this::mapRowToUser);
-    }
-
-    @Override
-    public List<User> findUserByCondition(Predicate<User> condition) {
-        return null;
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

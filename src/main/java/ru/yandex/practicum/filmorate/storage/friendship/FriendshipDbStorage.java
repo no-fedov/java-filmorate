@@ -9,8 +9,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository("friendshipDbStorage")
 @RequiredArgsConstructor
@@ -69,9 +69,10 @@ public class FriendshipDbStorage implements FriendshipStorage {
             listID.add(sqlRowSet.getInt("friend_id"));
         }
 
-        return listID.stream()
-                .map(user_id -> jdbcTemplate.query("SELECT * FROM user_filmorate WHERE id = ?",
-                        this::mapRowToUser, user_id).stream().findFirst().get())
-                .collect(Collectors.toList());
+        String placeholders = String.join(",", Collections.nCopies(listID.size(), "?"));
+
+        return jdbcTemplate.query(String.format("SELECT * FROM user_filmorate WHERE id IN (%s)", placeholders),
+                listID.toArray(),
+                this::mapRowToUser);
     }
 }

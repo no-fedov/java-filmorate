@@ -32,9 +32,11 @@ public class Film {
     @PositiveOrZero
     private int rate;
 
+    @NotNull
     private MPA mpa;
 
-    private final Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
+    private final Set<Genre> genres = new LinkedHashSet<>();
+//            new TreeSet<>(Comparator.comparing(Genre::getId, Comparator.naturalOrder()));
 
     public void likeFilm() {
         rate++;

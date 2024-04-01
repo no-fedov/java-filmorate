@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotExistEntity;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -19,7 +18,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,10 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FilmService {
 
-    @Qualifier("filmDbStorage")
     private final FilmStorage filmDbStorage;
 
-    @Qualifier("userDbStorage")
     private final UserStorage userDbStorage;
 
     private final GenreStorage genreStorage;
@@ -42,7 +38,10 @@ public class FilmService {
     private final LikeMarkStorage likeMarkStorage;
 
     public Film addFilm(Film film) {
-        Set<Genre> genres = findGenresToFilm(film); // ищем жанры из базы данных жанров
+        Set<Genre> genres = findGenresToFilm(film).stream()
+                .sorted(Comparator.comparing(Genre::getId, Comparator.naturalOrder()))
+                .collect(Collectors.toCollection(LinkedHashSet::new)); // ищем жанры из базы данных жанров
+
         MPA mpa = findMPAtoFilm(film); // ищем МПА из базы данных МПА
 
         // записываем фильм в базу данных и присваиваем id
@@ -62,11 +61,11 @@ public class FilmService {
         Film findFilm = filmDbStorage.findFilm(id)
                 .orElseThrow(() -> new NotFoundException("Фильм с id = " + id + " не найден"));
 
-        Set<Genre> genres = filmGenreStorage.findGenreOfFilm(id);
-        MPA mpa = mpaStorage.findMPAofFilm(id);
-        findFilm.addGenre(genres);
-        findFilm.setMpa(mpa);
+        Map<Integer, Set<Genre>> genreOfFilms = filmGenreStorage.findGenreOfFilm(List.of(findFilm));
 
+        if (genreOfFilms.get(id) != null) {
+            findFilm.addGenre(genreOfFilms.get(id));
+        }
         log.info("Обработан запрос на по поиску фильма. Найден фильм: {}.", findFilm);
         return findFilm;
     }
@@ -76,6 +75,7 @@ public class FilmService {
 
         filmGenreStorage.removeGenreFromFilm(film.getId());
         filmDbStorage.updateFilm(film);
+
         filmGenreStorage.addGenreToFilm(film, film.getGenres());
 
         log.info("Обновлен фильм: {}", film);
@@ -93,12 +93,16 @@ public class FilmService {
 
     public List<Film> getAllFilm() {
 
-        List<Film> listFilm = filmDbStorage.getAllFilm().stream()
-                .peek(film -> {
-                    film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
-                    film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
-                })
-                .collect(Collectors.toList());
+        List<Film> listFilm = filmDbStorage.getAllFilm();
+
+        Map<Integer, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(listFilm);
+
+        for (Film film : listFilm) {
+            Set<Genre> genres = mapFilmGenre.get(film.getId());
+            if (genres != null) {
+                film.addGenre(genres);
+            }
+        }
 
         log.info("Запрос на список всех фильмов");
         return listFilm;
@@ -115,19 +119,19 @@ public class FilmService {
     }
 
     public List<Film> getPopularFilmList(Integer count) {
-        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count)
-                .stream()
-                .peek(film -> {
-                    film.addGenre(filmGenreStorage.findGenreOfFilm(film.getId()));
-                    film.setMpa(mpaStorage.findMPAofFilm(film.getId()));
-                })
-                .collect(Collectors.toList());
-        log.info("Обработан запрос на получение всех фильмов");
-        return listFilm;
-    }
+        List<Film> listFilm = filmDbStorage.getAllPopularFilm(count);
 
-    public List<Film> findFilmByCondition(Predicate<Film> condition) {
-        return filmDbStorage.findFilmByCondition(condition);
+        Map<Integer, Set<Genre>> mapFilmGenre = filmGenreStorage.findGenreOfFilm(listFilm);
+
+        for (Film film : listFilm) {
+            Set<Genre> genres = mapFilmGenre.get(film.getId());
+            if (genres != null) {
+                film.addGenre(genres);
+            }
+        }
+
+        log.info("Обработан запрос на получение популярных фильмов");
+        return listFilm;
     }
 
     private Film findFilmForAddLike(Integer filmID, Integer userID) {

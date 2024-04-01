@@ -19,17 +19,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({ValidationException.class, NotExistEntity.class, ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final ValidationException e) {
-        log.warn("Ошибка при изменении/добавлении email. {}.", e.getMessage());
-        return Map.of("Ошибка при запросе: ", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNotExistEntity(final NotExistEntity e) {
-        log.warn("Ошибка при выполнении запроса: {}.", e.getMessage());
+    public Map<String, String> handleValidationException(final RuntimeException e) {
+        log.warn("Ошибка при при выполнении запроса: {}.", e.getMessage());
         return Map.of("Ошибка при запросе: ", e.getMessage());
     }
 
@@ -38,13 +31,6 @@ public class ErrorHandler {
     public Map<String, String> handleNotFoundException(final NotFoundException e) {
         log.warn("Ошибка при выполнении запроса: {}.", e.getMessage());
         return Map.of("Ошибка при запросе: ", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleMethodParameterValidationException(final ConstraintViolationException e) {
-        log.warn("Ошибка в строке запроса URL: {}", e.getMessage());
-        return Map.of("Ошибка в URI запроса", e.getMessage());
     }
 
     @ExceptionHandler

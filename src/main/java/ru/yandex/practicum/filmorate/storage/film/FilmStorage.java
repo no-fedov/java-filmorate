@@ -4,7 +4,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public interface FilmStorage {
     Film addFilm(Film film);
@@ -18,6 +17,4 @@ public interface FilmStorage {
     List<Film> getAllFilm();
 
     List<Film> getAllPopularFilm(int count);
-
-    List<Film> findFilmByCondition(Predicate<Film> condition);
 }

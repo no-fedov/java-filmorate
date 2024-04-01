@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS film (
   description VARCHAR(200),
   duration INTEGER CHECK (duration > 0),
   release_date DATE NOT NULL CHECK (release_date > '1895-12-28'),
-  rate INTEGER NOT NULL,
   rating_id INTEGER REFERENCES rating_mpa (id)
 );
 

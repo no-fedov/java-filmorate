@@ -16,10 +16,6 @@ public class LikeMarkDbStorage implements LikeMarkStorage {
         String sqlQueryForLikeMark = "INSERT INTO like_mark_film (film_id, user_id) VALUES (?, ?)";
 
         jdbcTemplate.update(sqlQueryForLikeMark, filmId, userId);
-
-        String sqlQueryForLikeToFilm = "UPDATE film SET rate = rate + 1 WHERE id = ?";
-
-        jdbcTemplate.update(sqlQueryForLikeToFilm, filmId);
     }
 
     @Override
@@ -27,9 +23,5 @@ public class LikeMarkDbStorage implements LikeMarkStorage {
         String sqlQueryForUnLikeMark = "DELETE FROM like_mark_film WHERE film_id = ? AND user_id = ?";
 
         jdbcTemplate.update(sqlQueryForUnLikeMark, filmId, userId);
-
-        String sqlQueryForUnLikeToFilm = "UPDATE film SET rate = rate - 1 WHERE id = ?";
-
-        jdbcTemplate.update(sqlQueryForUnLikeToFilm, filmId);
     }
 }
